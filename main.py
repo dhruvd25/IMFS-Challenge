@@ -5,62 +5,7 @@ from utils.dataprep import *
 import json
 import requests
 
-# resp = requests.get('https://www.sec.gov/files/company_tickers.json')
-# company_ticker = resp.json()
 
-# with open('./data/constituents_history.pkl', 'rb') as fp:
-#     data = pickle.load(fp)
-
-# daily_ticks = {}
-# all_tickers = {}
-# daily_price = {}
-
-# for i in data.iterrows():
-#     if len(i[1][0]) > 0:
-#         daily_ticks[i[0]] = []
-#         daily_price[i[0]] = []
-#         for attribs in i[1][0]:
-#             daily_ticks[i[0]].append(attribs[0])
-#             daily_price[i[0]].append(attribs[11]['raw'])
-#             if attribs[0] in all_tickers.keys():
-#                 all_tickers[attribs[0]] += 1
-#             else:
-#                 all_tickers[attribs[0]] = 1
-
-# valid_stocks = []
-# for i, j in company_ticker.items():
-#     if j['ticker'] in all_tickers.keys():
-#         valid_stocks.append(j['ticker'])
-
-# execute("DROP TABLE IF EXISTS historical_price")
-# query = """CREATE TABLE historical_price (ticker text,
-#                                         date text,
-#                                         open real,
-#                                         close real,
-#                                         volume real,
-#                                         PRIMARY KEY(ticker,date)) """
-# execute(query)
-
-# execute("DROP TABLE IF EXISTS ticker_info")
-# query_ticker_info = """CREATE TABLE ticker_info (ticker text,
-#                                         isin text,
-#                                         sector real,
-#                                         company_name text,
-#                                         PRIMARY KEY(ticker,isin)) """
-# execute(query_ticker_info)
-
-# query_insert = '''INSERT INTO historical_price VALUES (?,?,?,?,?) '''
-# for i in values:
-#     executemany(query_insert,i)
-
-# insert_query_tick_info = '''INSERT INTO ticker_info VALUES (?,?,?,?) '''
-# executemany(insert_query_tick_info,tuple(ticker_inf0))
-# date = '2018-01-02'
-# query = f'''SELECT ROUND(SUM(open)/COUNT(open),2) index_open,
-#                   ROUND(SUM(close)/COUNT(close),2) as index_close,
-#                   ROUND(AVG(volume)) as avg_vol
-#             FROM historical_price WHERE date='{date}' '''
-# fetch(query,fetch_type='all',with_cols='true')
 if __name__=='__main__':
     valid_stocks = ['A', 'AA', 'AAL', 'AAN', 'AAP', 'AAPL', 'ABBV', 'ABC', 'ABMD', 'ABNB', 'ABT', 'ACA', 'ACAD', 'ACC', 'ACGL', 'ACHC', 'ACI', 'ACIW', 'ACM', 'ACN', 'ADBE', 'ADI', 'ADM', 'ADNT', 'ADP', 'ADS', 'ADSK', 'ADT', 'AEE', 'AEO', 'AEP', 'AES', 'AET', 'AFG', 'AFL', 'AFRM', 'AGCO', 'AGIO', 'AGNC', 'AGO', 'AGR', 'AIG', 'AIRC', 'AIT', 'AIV', 'AIZ', 'AJG', 'AKAM', 'AKR', 'AL', 'ALB', 'ALE', 'ALEX', 'ALGM', 'ALGN', 'ALGT', 'ALK', 'ALKS', 'ALL', 'ALLE', 'ALLO', 'ALLY', 'ALNY', 'ALSN', 'ALV', 'ALXN', 'AMAT', 'AMCR', 'AMCX', 'AMD', 'AME', 'AMED', 'AMG', 'AMGN', 'AMH', 'AMP', 'AMRX', 'AMT', 'AMWL', 'AMZN', 'AN', 'ANET', 'ANGI', 'ANSS', 'ANTM', 'AON', 'AOS', 'APA', 'APD', 'APH', 'APLE', 'APO', 'APTV', 'AR', 'ARE', 'ARES', 'ARMK', 'ARNC', 'ARRY', 'ARW', 'ASAN', 'ASB', 'ASGN', 'ASH', 'ATGE', 'ATH', 'ATHN', 'ATI', 'ATO', 'ATR', 'ATUS', 'ATVI', 'AVA', 'AVB', 'AVGO', 'AVIR', 'AVLR', 'AVNS', 'AVNT', 'AVT', 'AVTR', 'AVY', 'AWI', 'AWK', 'AXON', 'AXP', 'AXS', 'AXTA', 'AYI', 'AYX', 'AZO', 'AZPN', 'B', 'BA', 'BAC', 'BAH', 'BAX', 'BBBY', 'BBY', 'BC', 'BCO', 'BDC', 'BDN', 'BDX', 'BECN', 'BEN', 'BERY', 'BFAM', 'BG', 'BGCP', 'BGS', 'BHF', 'BIG', 'BIIB', 'BILL', 'BIO', 'BJ', 'BK', 'BKD', 'BKH', 'BKI', 'BKNG', 'BKR', 'BKU', 'BLI', 'BLK', 'BLKB', 'BLL', 'BLMN', 'BLUE', 'BMBL', 'BMRN', 'BMY', 'BOH', 'BOKF', 'BPMC', 'BPOP', 'BR', 'BRKR', 'BRO', 'BRX', 'BSX', 'BSY', 'BTU', 'BURL', 'BWA', 'BWXT', 
     'BX', 'BXMT', 'BXP', 'BXS', 'BYD', 'BYND', 'C', 'CA', 'CABO', 'CACC', 'CACI', 'CAG', 'CAH', 'CAKE', 'CAR', 'CARG', 'CARR', 'CARS', 'CASY', 'CAT', 'CATY', 'CB', 'CBOE', 'CBRE', 'CBRL', 'CBSH', 'CBT', 'CC', 'CCI', 'CCK', 'CCL', 'CDAY', 'CDEV', 'CDK', 'CDNS', 'CDW', 'CE', 'CEIX', 'CERN', 'CF', 'CFFN', 'CFG', 'CFR', 'CFX', 'CG', 'CGNX', 'CHD', 'CHDN', 'CHE', 'CHGG', 'CHH', 'CHK', 'CHRW', 'CHTR', 'CHWY', 'CHX', 'CI', 'CIEN', 'CIM', 'CINF', 'CIT', 'CL', 'CLB', 'CLH', 'CLI', 'CLR', 'CLVS', 'CLVT', 'CLX', 'CMA', 'CMC', 'CMCSA', 'CME', 'CMG', 'CMI', 'CMP', 'CMPR', 'CMS', 'CNA', 'CNC', 'CNDT', 'CNK', 'CNO', 'CNP', 'CNX', 'CNXC', 'COF', 'COG', 'COHR', 'COIN', 'COLD', 'COLM', 'COMM', 'CONE', 'COO', 'COP', 'COR', 'COST', 'COTY', 'COUP', 'CPB', 'CPRI', 'CPRT', 'CPT', 'CR', 'CREE', 'CRI', 'CRL', 'CRM', 'CRNC', 'CRS', 'CRUS', 'CRWD', 'CSCO', 'CSGP', 'CSL', 'CSX', 'CTAS', 'CTLT', 'CTSH', 'CTVA', 'CTXS', 'CUBE', 'CUZ', 'CVA', 'CVET', 'CVI', 'CVLT', 'CVNA', 'CVS', 'CVX', 'CW', 'CWK', 'CXP', 'CXW', 'CZR', 'D', 'DAL', 'DAN', 'DAR', 'DASH', 'DBD', 'DBX', 'DCI', 'DCT', 'DD', 'DDD', 'DDOG', 'DDS', 'DE', 'DECK', 'DEI', 'DELL', 'DFS', 'DG', 'DGX', 'DHC', 'DHI', 'DHR', 'DIS', 'DISCA', 'DISCK', 'DISH', 'DK', 'DKNG', 'DKS', 'DLB', 'DLR', 'DLTR', 'DLX', 'DNB', 'DNOW', 'DOC', 'DOCU', 'DOV', 'DOW', 'DOX', 'DPZ', 'DRE', 'DRH', 'DRI', 'DRQ', 'DT', 'DTE', 'DTM', 'DUK', 'DVA', 'DVN', 'DXC', 'DXCM', 'DY', 'EA', 'EAF', 'EAT', 'EBAY', 

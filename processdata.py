@@ -9,67 +9,10 @@ from multiprocessing import Pool
 
 
 
-class ETL():
-    def __init__(self, ticker, start_date: str = '2018-01-01', end_date: str = None):
-        self.ticker = ticker
-        self.start_date = start_date
-        self.end_date = end_date
-
-    def process_historical(self):
-        self.out_df = get_historical_info_single(
-            self.ticker, start_date=self.start_date, end_date=self.end_date)
-        return True
-
-    def clean_data(self):
-        self.out_df.reset_index(inplace=True)
-        self.out_df.Date = self.out_df.Date.astype(str)
-        self.out_df['Ticker'] = self.ticker
-        self.out_df = self.out_df[[
-            'Ticker', 'Date', 'Open', 'Close', 'Volume']]
-        self.vals = tuple(self.out_df.itertuples(index=False, name=None))
-        return True
-
-    def insert_rows(self):
-        query_insert = '''INSERT INTO historical_price VALUES (?,?,?,?,?) '''
-        executemany(query_insert, self.vals)
-        return True
-
-    def execute(self):
-        self.process_historical()
-        self.clean_data()
-        self.insert_rows()
-        return True
 
 
-def pool_call(ticker):
-    return ETL(ticker).execute()
 
 
-def create_db_tables():
-
-    execute("DROP TABLE IF EXISTS historical_price")
-    query = """CREATE TABLE historical_price (
-                                        ticker text,
-                                        date text,
-                                        open real,
-                                        close real,
-                                        volume real,
-                                        PRIMARY KEY(ticker,date)
-                                        ) 
-            """
-    execute(query)
-
-    execute("DROP TABLE IF EXISTS ticker_info")
-    query_ticker_info = """CREATE TABLE ticker_info (
-                                            ticker text,
-                                            isin text,
-                                            sector real,
-                                            company_name text,
-                                            PRIMARY KEY(ticker,isin)
-                                            )
-                        """
-    execute(query_ticker_info)
-    return True
 
 if __name__ == '__main__':
 
@@ -78,28 +21,58 @@ if __name__ == '__main__':
     with open('./data/constituents_history.pkl', 'rb') as fp:
         data = pickle.load(fp)
 
-    daily_ticks = {}
+    # keep track of all tickers provided in original file
     all_tickers = {}
+
+    # Dictionary to keep track of valid ticker
+    meta_data = {}
+    meta_data['valid_stock_ticker'] = []
+    meta_data['non_stock_ticker'] = []
+    meta_data['delisted_ticker'] = ["RHT", "TIF", "CXO", "GWR", "PE",
+                                    "ZAYO", "LOXO", "ELLI", "USG", "TCF", "CLGX", "CMD", "CTB"]
 
     for i in data.iterrows():
         if len(i[1][0]) > 0:
-            daily_ticks[i[0]] = []
             for attribs in i[1][0]:
-                daily_ticks[i[0]].append(attribs[0])
                 if attribs[0] in all_tickers.keys():
                     all_tickers[attribs[0]] += 1
                 else:
                     all_tickers[attribs[0]] = 1
 
-    valid_stocks = []
+    # get all stocks present in file read from SEC
+    all_stocks = []
+    for i, j in company_ticker.items():
+        all_stocks.append(j['ticker'])
+
+    # filter out all tickers which aren't stock tickers
+    for i, j in all_tickers.items():
+        if i not in all_stocks:
+            meta_data['non_stock_ticker'].append(i)
+
+    # subset tickers from all tickers to just valid tickers
+
     for i, j in company_ticker.items():
         if j['ticker'] in all_tickers.keys():
-            valid_stocks.append(j['ticker'])
-    
+            meta_data['valid_stock_ticker'].append(j['ticker'])
+
+    # Remove all delisted stocks from valid stock list
+    meta_data['valid_stock_ticker'] = list(
+        set(meta_data['valid_stock_ticker']) - set(meta_data['delisted_ticker']))
+
+    with open('./data/meta_data.json','w') as fp:
+        json.dump(meta_data,fp)
+
     print('Creating Tables in database')
     # create_db_tables()
 
     print('Performing ETL.....')
+    print('Processing Historical Pricing information')
     with Pool(5) as pool:
-        output = pool.map(pool_call, valid_stocks)
-    print('Rows added to DB!')
+        output = pool.map(pool_call, meta_data['valid_stock_ticker'])
+    print('Historical Prices added to DB!')
+
+    print("Processing additional information for tickers")
+    with Pool(5) as pool:
+        ticker_info = pool.map(
+            get_ticker_info, meta_data['valid_stock_ticker'])
+    print('Ticker information added to DB!')
