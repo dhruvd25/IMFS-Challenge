@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+./__pycache__/.
 
 # C extensions
 *.so
@@ -112,3 +113,18 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+test.json
+data/ticker_info.pkl
+eda.ipynb
+iframe_figures/figure_195.html
+iframe_figures/figure_199.html
+iframe_figures/figure_204.html
+iframe_figures/figure_207.html
+iframe_figures/figure_212.html
+iframe_figures/figure_213.html
+iframe_figures/figure_195.html
+iframe_figures/figure_199.html
+iframe_figures/figure_204.html
+iframe_figures/figure_207.html
+iframe_figures/figure_212.html
+iframe_figures/figure_213.html
