@@ -8,7 +8,6 @@ import plotly.express as px
 import pandas as pd
 
 
-
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 query_all_dates = """SELECT DISTINCT date from historical_price"""
@@ -31,10 +30,11 @@ dropdown = html.Div([
 final_table = html.Div(id="final_table")
 
 
-index_cal,columns = get_total_index()
-cols = ['Date','Index Close','Volume']
-df = pd.DataFrame(index_cal,columns=cols)
-fig_timeline = px.line(df, x='Date', y='Index Close', title='Index Value Timeline')
+index_cal, columns = get_total_index()
+cols = ['Date', 'Index Close', 'Volume']
+df = pd.DataFrame(index_cal, columns=cols)
+fig_timeline = px.line(df, x='Date', y='Index Close',
+                       title='Index Value Timeline')
 
 fig_timeline.update_xaxes(
     rangeslider_visible=True,
@@ -54,14 +54,13 @@ fig_timeline.update_xaxes(
 
 app.layout = html.Div(children=[
     html.H1(children='Price Weighted Index Overview'),
-    dropdown,
+    html.Div(children='Total Index View'),
+    dcc.Graph(figure=fig_timeline),
     html.Div(children='Historical Index View'),
+    dropdown,
     final_table,
     html.Div(children='Sector Breakdown for Index'),
-    dcc.Graph(id="bar_plot"),
-    html.Div(children='Total Index View'),
-    dcc.Graph(figure=fig_timeline)
-    
+    dcc.Graph(id="bar_plot")
 ]
 )
 
@@ -91,12 +90,12 @@ def update_output(value):
     graph_data = return_sector_open_close_volume(value)
     # for i in value:
     #     graph_data += return_sector_open_close_volume(i)
-    cols = ['Date','Sector','Sector Open','Sector Close','Avg Vol']
+    cols = ['Date', 'Sector', 'Sector Open', 'Sector Close', 'Avg Vol']
     df = pd.DataFrame(graph_data, columns=cols)
-    df.fillna('None',inplace=True)
-    fig = px.pie(df,names='Sector',values='Sector Close',color='Sector')
+    df.fillna('None', inplace=True)
+    fig = px.pie(df, names='Sector', values='Sector Close', color='Sector')
     return fig
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server()

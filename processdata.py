@@ -7,13 +7,6 @@ from utils.dataprep import *
 import requests
 from multiprocessing import Pool
 
-
-
-
-
-
-
-
 if __name__ == '__main__':
 
     resp = requests.get('https://www.sec.gov/files/company_tickers.json')
