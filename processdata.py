@@ -56,7 +56,7 @@ if __name__ == '__main__':
         json.dump(meta_data,fp)
 
     print('Creating Tables in database')
-    # create_db_tables()
+    create_db_tables()
 
     print('Performing ETL.....')
     print('Processing Historical Pricing information')

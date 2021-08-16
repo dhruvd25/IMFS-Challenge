@@ -1,5 +1,5 @@
 import yfinance as yf
-from dbutils import *
+from utils.dbutils import *
 
 def get_historical_info_single(ticker:str, start_date:str=None, end_date:str=None):
     '''
@@ -107,4 +107,20 @@ def create_db_tables():
                                             )
                         """
     execute(query_ticker_info)
+
+    execute("DROP TABLE IF EXISTS index_value")
+    query_index_value = """CREATE TABLE index_value (date text,
+                                        index_open real,
+                                        index_close real,
+                                        PRIMARY KEY(date)) """
+    execute(query_index_value)
+
+    populate_index_history = '''INSERT INTO index_value (date, index_open,index_close)
+    SELECT date as date,
+                    ROUND(SUM(open)/COUNT(open),2) as index_open,
+                    ROUND(SUM(close)/COUNT(close),2) as index_close
+    FROM historical_price
+    GROUP BY date '''
+    execute(populate_index_history)
+
     return True
