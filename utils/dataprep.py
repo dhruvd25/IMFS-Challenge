@@ -35,20 +35,32 @@ def get_ticker_info(ticker: str):
     :param ticker: string format ticker
     :return: ticker name, ticker isin, ticker sector, company name
     '''
-    tick_data = yf.Ticker(ticker.uppper())
+    tick_data = yf.Ticker(ticker.upper())
     ticker_info = tick_data.info
+    
     try:
         sector = ticker_info['sector']
     except:
         sector = None
         print(f"SECTOR MISSING FOR {ticker}")
+
     try:
         name = ticker_info['longName']
     except:
-        name = None
-        print(f"ISIN MISSING FOR {ticker}")
+        try:
+            name = ticker_info['shortName']
+        except:
+            name = None
+            print(f"Name MISSING FOR {ticker}")
 
-    return ticker, tick_data.isin, sector, name
+    try:
+        isin = tick_data.isin
+    except:
+        isin = None
+        print(f"Name MISSING FOR {ticker}")
+
+
+    return ticker, isin, sector, name
 
 
 def pool_call(ticker):
@@ -125,7 +137,7 @@ def create_db_tables():
     query_ticker_info = """CREATE TABLE ticker_info (
                                             ticker text,
                                             isin text,
-                                            sector real,
+                                            sector text,
                                             company_name text,
                                             PRIMARY KEY(ticker,isin)
                                             )

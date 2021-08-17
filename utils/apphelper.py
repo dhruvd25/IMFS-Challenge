@@ -27,13 +27,12 @@ def return_sector_open_close_volume(date: str):
     :param date: string format date  
     '''
     query = f'''
-                SELECT t3.sector, sum(t3.open), sum(t3.close), avg(t3.volume)
+                SELECT COALESCE(t3.sector,'Sector N/A'), sum(t3.open), sum(t3.close), avg(t3.volume)
                 FROM (SELECT t1.ticker,t2.sector,t1.open,t1.close,t1.volume
                 FROM historical_price t1 
                 LEFT JOIN ticker_info t2
                 ON t1.ticker = t2.ticker
                 WHERE t1.date ='{date}')t3
-                WHERE t3.sector is NOT NULL
                 GROUP BY t3.sector
             '''
     data = fetch(query, fetch_type='all', with_cols=True)[0]
