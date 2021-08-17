@@ -11,6 +11,7 @@ if __name__ == '__main__':
 
     resp = requests.get('https://www.sec.gov/files/company_tickers.json')
     company_ticker = resp.json()
+    
     with open('./data/constituents_history.pkl', 'rb') as fp:
         data = pickle.load(fp)
 
@@ -66,8 +67,9 @@ if __name__ == '__main__':
 
     print("Processing additional information for tickers")
     with Pool(5) as pool:
-        ticker_info = pool.map(
+        ticker_info = pool.map( 
             get_ticker_info, meta_data['valid_stock_ticker'])
+    executemany("INSERT INTO ticker_info VALUES (?,?,?,?)",tuple(ticker_info))
     print('Ticker information added to DB!')
 
     print('Calculating Index...')

@@ -2,11 +2,12 @@
 
 ## Code Setup
 ```
-# Code runs on python 3 or up, refer to 
+# Code runs on python 3 or up
 # Install required packages
 pip install -r requirements.txt
 
 #run the following file to create sqlite3 database and populate it with required data
+#database file already added in project, ignore following file to run app directly
 python3 processdata.py
 
 # Visualize date
