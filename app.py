@@ -2,7 +2,7 @@ import dash
 import dash_html_components as html
 import dash_core_components as dcc
 from utils.dbutils import *
-from utils.app_helper import *
+from utils.apphelper import *
 import dash_table as dt
 import plotly.express as px
 import pandas as pd
@@ -22,7 +22,7 @@ dropdown = html.Div([
         options=[
             {'label': i[0], 'value':i[0]} for i in all_dates
         ],
-        value='2021-08-10',
+        value='2020-12-31',
         multi=False
     ),
 ])
@@ -31,9 +31,9 @@ final_table = html.Div(id="final_table")
 
 
 index_cal, columns = get_total_index()
-cols = ['Date', 'Index Close', 'Volume']
+cols = ['Date', 'Index Open', 'Index Close']
 df = pd.DataFrame(index_cal, columns=cols)
-fig_timeline = px.line(df, x='Date', y='Index Close',
+fig_timeline = px.line(df, x='Date',y=['Index Close','Index Open'],
                        title='Index Value Timeline')
 
 fig_timeline.update_xaxes(
@@ -71,14 +71,13 @@ app.layout = html.Div(children=[
 def update_output(value):
 
     table_values = [get_index_open_close(value)]
-    # for i in value:
-    #     table_values.append(get_index_open_close(i))
+
     dtable = dt.DataTable(
-        id='table',
-        columns=[{"name": "Index Open", "id": "Index Open"},
+        id = 'table',
+        columns = [{"name": "Index Open", "id": "Index Open"},
                  {"name": "Index Close", "id": "Index Close"},
                  {"name": "Average Volume", "id": "Average Volume"}],
-        data=table_values)
+        data = table_values)
     return [dtable]
 
 
@@ -93,9 +92,12 @@ def update_output(value):
     cols = ['Date', 'Sector', 'Sector Open', 'Sector Close', 'Avg Vol']
     df = pd.DataFrame(graph_data, columns=cols)
     df.fillna('None', inplace=True)
-    fig = px.pie(df, names='Sector', values='Sector Close', color='Sector')
+    fig = px.pie(df,
+                 names='Sector',
+                 values='Sector Close',
+                 color='Sector')
     return fig
 
 
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)

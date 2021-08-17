@@ -56,7 +56,7 @@ if __name__ == '__main__':
         json.dump(meta_data,fp)
 
     print('Creating Tables in database')
-    # create_db_tables()
+    create_db_tables()
 
     print('Performing ETL.....')
     print('Processing Historical Pricing information')
@@ -69,3 +69,7 @@ if __name__ == '__main__':
         ticker_info = pool.map(
             get_ticker_info, meta_data['valid_stock_ticker'])
     print('Ticker information added to DB!')
+
+    print('Calculating Index...')
+    create_daily_index_open_close()
+    print("Daily Open and Close for Index Calculated and saved to DB!")
