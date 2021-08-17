@@ -5,6 +5,10 @@
 - Section 2: Extract, Load and Transform Data
     - __[processdata.py](./processdata.py)__ handels all ETL process needed to load, transform and extract data to __database.db__  (SQLite3 Database we will be using for the rest of the process)
 - Section 3: 
+    - Calculate daily value for index, refer to create_daily_index_open_close function in [dataprep.py](./utils/dataprep.py)
+- Section 4 Visualize: Run [app.py](./app.py) to run Dash Application
+    - App supports following visulization: Total index view from 2018 - August 2021, Given input date, sector distribution on relative weight basis
+    
     ![Alt text](./images/app_view.png?raw=true "Web App Sample View")
 ## Utility functions
 - __[dbutils.py](./utils/dbutils.py)__: Database utility function to query and write against database. Current code hardcodes database location in class, should be modified to pass another location 
