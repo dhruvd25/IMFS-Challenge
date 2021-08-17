@@ -1,7 +1,8 @@
 import yfinance as yf
 from utils.dbutils import *
 
-def get_historical_info_single(ticker:str, start_date:str=None, end_date:str=None):
+
+def get_historical_info_single(ticker: str, start_date: str = None, end_date: str = None):
     '''
     Function to return historical pricing information for given ticker
     :param ticker: Name of ticker
@@ -9,11 +10,12 @@ def get_historical_info_single(ticker:str, start_date:str=None, end_date:str=Non
     :param end_date: End date till which history is needed
     '''
     import yfinance as yf
-    ticker_info =yf.Ticker(ticker.upper())
+    ticker_info = yf.Ticker(ticker.upper())
     historical_info = ticker_info.history(start=start_date, end=end_date)
     return historical_info
 
-def get_historical_info_multiple(tickers:list, start_date:str=None, end_date:str=None):
+
+def get_historical_info_multiple(tickers: list, start_date: str = None, end_date: str = None):
     '''
     Function to return historical pricing information for given ticker
     :param ticker: Name of ticker
@@ -22,48 +24,63 @@ def get_historical_info_multiple(tickers:list, start_date:str=None, end_date:str
     '''
     history = {}
     for ticker in tickers:
-        history[ticker] = get_historical_info_single(ticker,start_date=start_date,end_date=end_date)
+        history[ticker] = get_historical_info_single(
+            ticker, start_date=start_date, end_date=end_date)
     return history
 
-def get_ticker_info(ticker:str):
-    tick_data = yf.Ticker(ticker)
+
+def get_ticker_info(ticker: str):
+    '''
+    Function to return basic attributes for given ticker
+    :param ticker: string format ticker
+    :return: ticker name, ticker isin, ticker sector, company name
+    '''
+    tick_data = yf.Ticker(ticker.uppper())
     ticker_info = tick_data.info
     try:
         sector = ticker_info['sector']
-    except: 
+    except:
         sector = None
         print(f"SECTOR MISSING FOR {ticker}")
     try:
         name = ticker_info['longName']
-    except: 
+    except:
         name = None
         print(f"ISIN MISSING FOR {ticker}")
 
-    return ticker,tick_data.isin,sector,name
+    return ticker, tick_data.isin, sector, name
 
-def clean_data(ticker,in_df):
-    in_df.reset_index(inplace=True)
-    in_df.Date = in_df.Date.astype(str)
-    in_df['Ticker'] = ticker
-    in_df = in_df [['Ticker','Date','Open','Close','Volume']]
-    vals = tuple(in_df.itertuples(index=False, name=None))
-    return vals
 
 def pool_call(ticker):
+    '''
+    Wrapper function used for multiprocessing
+    '''
     return ETL(ticker).execute()
+
 
 class ETL():
     def __init__(self, ticker, start_date: str = '2018-01-01', end_date: str = None):
-        self.ticker = ticker
+        '''
+        :param ticker: string format ticker 
+        :param start_date: start date for which the data is needed for given ticker, current default 2018-01-01
+        :paream end_date: end date till which historical data is needed
+        '''
+        self.ticker = ticker.upper()
         self.start_date = start_date
         self.end_date = end_date
 
     def process_historical(self):
+        '''
+        '''
         self.out_df = get_historical_info_single(
             self.ticker, start_date=self.start_date, end_date=self.end_date)
         return True
 
     def clean_data(self):
+        '''
+        Helper function to clean historical data for given ticker
+        '''
+ 
         self.out_df.reset_index(inplace=True)
         self.out_df.Date = self.out_df.Date.astype(str)
         self.out_df['Ticker'] = self.ticker
@@ -73,18 +90,25 @@ class ETL():
         return True
 
     def insert_rows(self):
+        '''
+        Insert data for given ticker to database
+        '''
         query_insert = '''INSERT INTO historical_price VALUES (?,?,?,?,?) '''
         executemany(query_insert, self.vals)
         return True
 
     def execute(self):
+
         self.process_historical()
         self.clean_data()
         self.insert_rows()
         return True
 
-def create_db_tables():
 
+def create_db_tables():
+    '''
+    Create required tables in database
+    '''
     execute("DROP TABLE IF EXISTS historical_price")
     query = """CREATE TABLE historical_price (
                                         ticker text,
@@ -114,7 +138,13 @@ def create_db_tables():
                                         index_close real,
                                         PRIMARY KEY(date)) """
     execute(query_index_value)
+    return True
 
+
+def create_daily_index_open_close():
+    '''
+    Populate index_value table in database
+    '''
     populate_index_history = '''INSERT INTO index_value (date, index_open,index_close)
     SELECT date as date,
                     ROUND(SUM(open)/COUNT(open),2) as index_open,
